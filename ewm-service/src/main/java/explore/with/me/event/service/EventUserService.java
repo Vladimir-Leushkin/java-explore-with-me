@@ -62,16 +62,16 @@ public class EventUserService {
 
     public List<EventShortDto> readEventsByUser(Long userId, Integer from, Integer size) {
         PageRequest pageRequest = pagination(from, size);
-        User user = userService.getUser(userId);
+        userService.getUser(userId);
         List<Event> events = eventRepository.findAllByInitiatorId(userId, pageRequest).toList();
         log.info("Найдены события : {}", events);
-        List<EventShortDto> eventDtos = new ArrayList<>();
+        List<EventShortDto> eventsDto = new ArrayList<>();
         if (events.size() != 0) {
-            eventDtos = events.stream()
-                    .map(event -> eventMapper.toEventShortDto(event))
+            eventsDto = events.stream()
+                    .map(eventMapper::toEventShortDto)
                     .collect(Collectors.toList());
         }
-        return eventDtos;
+        return eventsDto;
     }
 
     public EventFullDto readEventByUser(Long eventId, Long userId) {
@@ -79,8 +79,7 @@ public class EventUserService {
         Event event = findEventById(eventId);
         checkInitiatorEvent(event, user);
         log.info("Найдено событие : {}", event);
-        EventFullDto eventFullDto = eventMapper.toEventFullDto(event);
-        return eventFullDto;
+        return eventMapper.toEventFullDto(event);
     }
 
     public List<RequestDto> readRequestsByEvent(Long eventId, Long userId) {
@@ -89,10 +88,9 @@ public class EventUserService {
         checkInitiatorEvent(event, user);
         List<Request> requests = requestRepository.findAllByEventId(eventId);
         log.info("Найдены заявки : {} на событие : {}", requests, event);
-        List<RequestDto> requestDtos = requests.stream()
-                .map(request -> RequestMapper.toRequestDto(request))
+        return requests.stream()
+                .map(RequestMapper::toRequestDto)
                 .collect(Collectors.toList());
-        return requestDtos;
     }
 
     @Transactional
@@ -109,8 +107,7 @@ public class EventUserService {
         newEvent.setLocationLon(event.getLocationLon());
         Event saveEvent = eventRepository.save(newEvent);
         log.info("Добавлено отредактированное событие : {}", saveEvent);
-        EventFullDto eventFullDto = eventMapper.toEventFullDto(saveEvent);
-        return eventFullDto;
+        return eventMapper.toEventFullDto(saveEvent);
     }
 
     @Transactional
@@ -121,8 +118,7 @@ public class EventUserService {
         event.setState(State.CANCELED);
         Event saveEvent = eventRepository.save(event);
         log.info("Отменено событие : {}", saveEvent);
-        EventFullDto eventFullDto = eventMapper.toEventFullDto(saveEvent);
-        return eventFullDto;
+        return eventMapper.toEventFullDto(saveEvent);
     }
 
     @Transactional
@@ -140,7 +136,7 @@ public class EventUserService {
             saveEvent = eventRepository.save(event);
             log.info("Лимит участников : {}", event.getParticipantLimit() - event.getConfirmedRequests());
         }
-        if (saveEvent.getParticipantLimit() == saveEvent.getConfirmedRequests()) {
+        if (saveEvent.getParticipantLimit() <= saveEvent.getConfirmedRequests()) {
             List<Request> requests = requestRepository.findAllByEventId(eventId);
             for (Request oldRequest : requests) {
                 if (oldRequest.getStatus().equals(RequestState.PENDING)) {
@@ -150,8 +146,7 @@ public class EventUserService {
             }
             requestRepository.saveAll(requests);
         }
-        RequestDto requestDto = RequestMapper.toRequestDto(request);
-        return requestDto;
+        return RequestMapper.toRequestDto(request);
     }
 
     @Transactional
@@ -163,8 +158,7 @@ public class EventUserService {
         request.setStatus(RequestState.REJECTED);
         requestRepository.save(request);
         log.info("Отклонена заявка : {}", request);
-        RequestDto requestDto = RequestMapper.toRequestDto(request);
-        return requestDto;
+        return RequestMapper.toRequestDto(request);
     }
 
     public Event findEventById(Long eventId) {
