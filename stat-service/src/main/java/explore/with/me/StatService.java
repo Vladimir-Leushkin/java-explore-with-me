@@ -13,10 +13,8 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -33,34 +31,21 @@ public class StatService {
         statRepository.save(stat);
     }
 
-    public List<ViewsStats> readHits(String rangeStart, String rangeEnd, List<String> uris, Boolean unique) {
-        LocalDateTime start = null;
-        LocalDateTime end = null;
-        if (rangeStart == null || rangeEnd == null) {
-            rangeStart = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-            rangeEnd = LocalDateTime.now().plusYears(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        }
-        start = LocalDateTime.parse(
+    public Collection<ViewsStats> readHits(String rangeStart, String rangeEnd, List<String> uris, Boolean unique) {
+        LocalDateTime start = LocalDateTime.parse(
                 URLDecoder.decode(rangeStart, StandardCharsets.UTF_8),
                 DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        end = LocalDateTime.parse(
+        LocalDateTime end = LocalDateTime.parse(
                 URLDecoder.decode(rangeEnd, StandardCharsets.UTF_8),
                 DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        Collection<Stat> stats = new ArrayList<>();
+        Collection<ViewsStats> stats;
         if (unique) {
             stats = statRepository.getUniqueViews(start, end, uris);
         } else {
             stats = statRepository.getNotUniqueViews(start, end, uris);
         }
-        List<ViewsStats> viewsStats = new ArrayList<>();
-        if (stats.size() != 0) {
-            viewsStats = stats
-                    .stream()
-                    .map(stat -> StatMapper.toViewsStats(stat))
-                    .collect(Collectors.toList());
-        }
         log.info("Получена статистика по посещениям {}", stats);
-        return viewsStats;
+        return stats;
     }
 
     public Integer getViews(String uri) {

@@ -102,9 +102,9 @@ public class EventMapper {
         );
     }
 
-    private Long getViews(Long eventId) {
+    private Integer getViews(Long eventId) {
         String uri = "/events/" + eventId;
-        return (Long) client.getViews(uri);
+        return client.getViews(uri).getBody();
     }
 }
 
