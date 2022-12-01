@@ -20,7 +20,7 @@ public class Compilation {
     private Long id;
     @Column(name = "title", nullable = false)
     private String title;
-    @Column(name = "pinned")
+    @Column(name = "pinned", nullable = false)
     private Boolean pinned;
     @ManyToMany
     @JoinTable(name = "EVENT_COMPILATIONS",

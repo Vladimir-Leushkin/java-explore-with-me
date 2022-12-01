@@ -23,9 +23,9 @@ public class Event {
     @Column(name = "annotation", nullable = false)
     private String annotation;
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
-    private Integer confirmedRequests;
+    //private Integer confirmedRequests;
     @Column(name = "created_on", nullable = false)
     private LocalDateTime createdOn;
     @Column(name = "description", nullable = false)
@@ -33,7 +33,7 @@ public class Event {
     @Column(name = "event_date", nullable = false)
     private LocalDateTime eventDate;
     @ManyToOne
-    @JoinColumn(name = "initiator")
+    @JoinColumn(name = "initiator", nullable = false)
     private User initiator;
     @Column(name = "location_lat")
     private Double locationLat;
@@ -48,6 +48,7 @@ public class Event {
     @Column(name = "request_moderation")
     private Boolean requestModeration;
     @Enumerated(EnumType.STRING)
+    @Column(name = "state", nullable = false)
     private State state;
     @Column(name = "title", nullable = false)
     private String title;

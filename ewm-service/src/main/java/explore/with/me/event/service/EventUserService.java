@@ -125,18 +125,17 @@ public class EventUserService {
     public RequestDto confirmRequest(Long eventId, Long userId, Integer reqId) {
         User user = userService.getUser(userId);
         Event event = findEventById(eventId);
-        Request request = requestService.findRequest(reqId);
         checkInitiatorEvent(event, user);
-        Event saveEvent = new Event();
-        if (event.getParticipantLimit() > event.getConfirmedRequests()) {
+        Request request = requestService.findRequest(reqId);
+        checkRequestConfirmed(request);
+        Integer conReq = getConfirmedRequest(event);
+        if (event.getParticipantLimit() > conReq) {
             request.setStatus(RequestState.CONFIRMED);
             requestRepository.save(request);
             log.info("Одобрена заявка : {}", request);
-            event.setConfirmedRequests(event.getConfirmedRequests() + 1);
-            saveEvent = eventRepository.save(event);
-            log.info("Лимит участников : {}", event.getParticipantLimit() - event.getConfirmedRequests());
+            log.info("Осталось мест : {}", event.getParticipantLimit() - conReq);
         }
-        if (saveEvent.getParticipantLimit() <= saveEvent.getConfirmedRequests()) {
+        if (event.getParticipantLimit() <= (conReq + 1)) {
             List<Request> requests = requestRepository.findAllByEventId(eventId);
             for (Request oldRequest : requests) {
                 if (oldRequest.getStatus().equals(RequestState.PENDING)) {
@@ -183,6 +182,16 @@ public class EventUserService {
     protected void checkPublishedEvent(Event event) {
         if (event.getState().equals(State.PUBLISHED)) {
             throw new ValidationException("Опубликованное событие редактировать нельзя");
+        }
+    }
+
+    protected Integer getConfirmedRequest(Event event) {
+        return requestRepository.findConfirmedRequest(event.getId(), RequestState.CONFIRMED);
+    }
+
+    protected void checkRequestConfirmed(Request request) {
+        if (request.getStatus().equals(RequestState.CONFIRMED)) {
+            throw new ValidationException("Заявка на участие уже одобрена");
         }
     }
 

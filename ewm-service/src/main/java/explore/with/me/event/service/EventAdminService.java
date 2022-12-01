@@ -35,8 +35,8 @@ public class EventAdminService {
     private final CategoryService categoryService;
     private final EventMapper eventMapper;
 
-    public List<EventFullDto> readEventsByFilter(List<Long> user, List<String> states, List<Integer> categories, String rangeStart,
-                                                 String rangeEnd, Integer from, Integer size) {
+    public List<EventFullDto> readEventsByFilter(List<Long> user, List<String> states, List<Integer> categories,
+                                                 String rangeStart, String rangeEnd, Integer from, Integer size) {
         PageRequest pageRequest = pagination(from, size);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         List<EventFullDto> eventFullDtos;

@@ -40,12 +40,9 @@ public class RequestService {
         checkRequestEvent(event, user);
         checkParticipantLimit(event);
         checkReplaceRequest(event, user);
-        Request request = new Request(null, LocalDateTime.now(), event, user, RequestState.CONFIRMED);
+        Request request = new Request(null, LocalDateTime.now(), event, user, RequestState.PENDING);
         if (!event.getRequestModeration()) {
-            event.setConfirmedRequests(event.getConfirmedRequests() + 1);
-            eventRepository.save(event);
-        } else {
-            request.setStatus(RequestState.PENDING);
+            request.setStatus(RequestState.CONFIRMED);
         }
         Request saveRequest = requestRepository.save(request);
         log.info("Добавлен новый запрос на участие в событии : {}", saveRequest);
@@ -106,8 +103,13 @@ public class RequestService {
         }
     }
 
+    protected Integer getConfirmedRequest(Event event) {
+        Integer conReq = requestRepository.findConfirmedRequest(event.getId(), RequestState.CONFIRMED);
+        return conReq;
+    }
+
     protected void checkParticipantLimit(Event event) {
-        if (event.getParticipantLimit() != 0 && event.getParticipantLimit() <= event.getConfirmedRequests()) {
+        if (event.getParticipantLimit() != 0 && event.getParticipantLimit() <= getConfirmedRequest(event)) {
             throw new ForbiddenException("Лимит заявок на участие в событии исчерпан");
         }
     }
@@ -120,5 +122,4 @@ public class RequestService {
             }
         }
     }
-
 }

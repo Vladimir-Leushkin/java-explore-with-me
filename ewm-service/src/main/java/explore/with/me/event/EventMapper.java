@@ -28,19 +28,20 @@ public class EventMapper {
                 event.getId(),
                 event.getAnnotation(),
                 CategoryMapper.toCategoryDto(event.getCategory()),
-                event.getConfirmedRequests(),
-                event.getCreatedOn(),
-                event.getDescription(),
+                0,
                 event.getEventDate(),
                 UserMapper.toUserDtoShort(event.getInitiator()),
-                new Location(event.getLocationLat(), event.getLocationLon()),
                 event.getPaid(),
+                event.getTitle(),
+                getViews(event.getId()),
+                event.getCreatedOn(),
+                event.getDescription(),
+                new Location(event.getLocationLat(), event.getLocationLon()),
                 event.getParticipantLimit(),
                 event.getPublishedOn(),
                 event.getRequestModeration(),
-                event.getState(),
-                event.getTitle(),
-                getViews(event.getId())
+                event.getState()
+
 
         );
     }
@@ -50,7 +51,7 @@ public class EventMapper {
                 event.getId(),
                 event.getAnnotation(),
                 CategoryMapper.toCategoryDto(event.getCategory()),
-                event.getConfirmedRequests(),
+                0,
                 event.getEventDate(),
                 UserMapper.toUserDtoShort(event.getInitiator()),
                 event.getPaid(),
@@ -65,7 +66,6 @@ public class EventMapper {
                 null,
                 newEventDto.getAnnotation(),
                 category,
-                0,
                 LocalDateTime.now(),
                 newEventDto.getDescription(),
                 newEventDto.getEventDate(),
@@ -86,7 +86,6 @@ public class EventMapper {
                 eventUpdateDto.getEventId(),
                 eventUpdateDto.getAnnotation(),
                 category,
-                0,
                 LocalDateTime.now(),
                 eventUpdateDto.getDescription(),
                 eventUpdateDto.getEventDate(),
