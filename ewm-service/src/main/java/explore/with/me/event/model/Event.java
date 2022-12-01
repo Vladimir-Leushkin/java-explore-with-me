@@ -25,7 +25,6 @@ public class Event {
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
-    //private Integer confirmedRequests;
     @Column(name = "created_on", nullable = false)
     private LocalDateTime createdOn;
     @Column(name = "description", nullable = false)
