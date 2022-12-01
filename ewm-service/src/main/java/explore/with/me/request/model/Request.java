@@ -20,6 +20,7 @@ public class Request {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Column(name = "created_on", nullable = false)
     private LocalDateTime createdOn;
     @ManyToOne
     @JoinColumn(name = "event_id", nullable = false)

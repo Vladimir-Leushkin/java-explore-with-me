@@ -38,7 +38,8 @@ public class RequestService {
         Event event = findEventById(eventId);
         checkUnPublishedEvent(event);
         checkRequestEvent(event, user);
-        checkParticipantLimit(event);
+        Integer comfReq = getConfirmedRequest(event);
+        checkParticipantLimit(event, comfReq);
         checkReplaceRequest(event, user);
         Request request = new Request(null, LocalDateTime.now(), event, user, RequestState.PENDING);
         if (!event.getRequestModeration()) {
@@ -108,8 +109,8 @@ public class RequestService {
         return conReq;
     }
 
-    protected void checkParticipantLimit(Event event) {
-        if (event.getParticipantLimit() != 0 && event.getParticipantLimit() <= getConfirmedRequest(event)) {
+    protected void checkParticipantLimit(Event event, Integer comfReq) {
+        if (event.getParticipantLimit() != 0 && event.getParticipantLimit() <= comfReq) {
             throw new ForbiddenException("Лимит заявок на участие в событии исчерпан");
         }
     }
