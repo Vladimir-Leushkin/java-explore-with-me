@@ -105,7 +105,7 @@ public class RequestService {
     }
 
     protected Integer getConfirmedRequest(Event event) {
-        Integer conReq = requestRepository.findConfirmedRequest(event.getId(), RequestState.CONFIRMED);
+        Integer conReq = requestRepository.countByEventIdAndStatus(event.getId(), RequestState.CONFIRMED);
         return conReq;
     }
 

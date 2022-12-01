@@ -186,7 +186,7 @@ public class EventUserService {
     }
 
     protected Integer getConfirmedRequest(Event event) {
-        return requestRepository.findConfirmedRequest(event.getId(), RequestState.CONFIRMED);
+        return requestRepository.countByEventIdAndStatus(event.getId(), RequestState.CONFIRMED);
     }
 
     protected void checkRequestConfirmed(Request request) {
