@@ -1,7 +1,7 @@
 package explore.with.me.comment.dto;
 
-import explore.with.me.event.model.Event;
-import explore.with.me.user.model.User;
+import explore.with.me.event.dto.EventShortDto;
+import explore.with.me.user.dto.UserDtoShort;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -15,8 +15,8 @@ import java.time.LocalDateTime;
 public class CommentDto {
     private Long id;
     private String text;
-    private Event event;
-    private User commentator;
+    private EventShortDto event;
+    private UserDtoShort commentator;
     private LocalDateTime createdDate;
     private LocalDateTime editDate;
 }

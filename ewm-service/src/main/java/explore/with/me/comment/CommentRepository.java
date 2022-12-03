@@ -14,7 +14,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query(value = "select * " +
             "from COMMENTS " +
-            "where user_id like ?1 " +
-            "and event_id like ?2 ", nativeQuery = true)
+            "where user_id = ?1 " +
+            "and event_id = ?2 ", nativeQuery = true)
     Comment findAllByCommentatorIdAndEventId(Long userId, Long eventId);
 }
