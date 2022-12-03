@@ -58,6 +58,7 @@ public class ErrorHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .message(ex.getMessage())
                 .reason("Incorrect data was sent in the request")
+                .timestamp(LocalDateTime.now())
                 .build();
     }
 
