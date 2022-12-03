@@ -67,7 +67,7 @@ public class StatClient {
             String[] uri1 = views.get(i).getUri().split("/");
             Long idEvent = Long.valueOf(uri1[uri1.length - 1]);
             for (EventShortDto event : eventsShortDto) {
-                if (idEvent == event.getId()) {
+                if (idEvent.equals(event.getId())) {
                     event.setViews(Math.toIntExact(views.get(i).getHits()));
                 }
             }
@@ -88,7 +88,7 @@ public class StatClient {
             String[] uri1 = views.get(i).getUri().split("/");
             Long idEvent = Long.valueOf(uri1[uri1.length - 1]);
             for (EventFullDto event : eventsFullDto) {
-                if (idEvent == event.getId()) {
+                if (idEvent.equals(event.getId())) {
                     event.setViews(Math.toIntExact(views.get(i).getHits()));
                 }
             }
