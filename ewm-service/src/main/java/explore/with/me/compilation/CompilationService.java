@@ -26,7 +26,6 @@ public class CompilationService {
     private final CompilationRepository compilationRepository;
     private final EventRepository eventRepository;
     private final EventUserService eventUserService;
-    private final CompilationMapper compilationMapper;
 
     @Transactional
     public CompilationDto createCompilation(NewCompilationDto newCompilationDto) {
@@ -37,7 +36,7 @@ public class CompilationService {
         Compilation compilation = CompilationMapper.toCompilation(newCompilationDto, events);
         Compilation saveCompilation = compilationRepository.save(compilation);
         log.info("Добавлена новая подборка событий : {}", saveCompilation);
-        CompilationDto compilationDto = compilationMapper.toCompilationDto(saveCompilation);
+        CompilationDto compilationDto = CompilationMapper.toCompilationDto(saveCompilation);
         return compilationDto;
     }
 
@@ -49,12 +48,12 @@ public class CompilationService {
         } else {
             compilations = compilationRepository.findAllByPinned(pinned, pageRequest).toList();
         }
-        return compilationMapper.toCompilationDtos(compilations);
+        return CompilationMapper.toCompilationDtos(compilations);
     }
 
     public CompilationDto readCompilationById(Long compId) {
         Compilation compilation = getCompilation(compId);
-        return compilationMapper.toCompilationDto(compilation);
+        return CompilationMapper.toCompilationDto(compilation);
     }
 
     @Transactional

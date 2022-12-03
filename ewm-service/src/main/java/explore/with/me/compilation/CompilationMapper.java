@@ -5,17 +5,13 @@ import explore.with.me.compilation.dto.NewCompilationDto;
 import explore.with.me.compilation.model.Compilation;
 import explore.with.me.event.EventMapper;
 import explore.with.me.event.model.Event;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
-@RequiredArgsConstructor
+
 public class CompilationMapper {
 
-    private final EventMapper eventMapper;
 
     public static Compilation toCompilation(NewCompilationDto newCompilationDto, List<Event> events) {
         return new Compilation(
@@ -26,17 +22,17 @@ public class CompilationMapper {
         );
     }
 
-    public CompilationDto toCompilationDto(Compilation compilation) {
+    public static CompilationDto toCompilationDto(Compilation compilation) {
         return new CompilationDto(
                 compilation.getId(),
                 compilation.getTitle(),
                 compilation.getPinned(),
                 compilation.getEvents().stream()
-                        .map(event -> eventMapper.toEventShortDto(event)).collect(Collectors.toList())
+                        .map(event -> EventMapper.toEventShortDto(event)).collect(Collectors.toList())
         );
     }
 
-    public List<CompilationDto> toCompilationDtos(List<Compilation> compilations) {
+    public static List<CompilationDto> toCompilationDtos(List<Compilation> compilations) {
         List compilationDtos = compilations
                 .stream()
                 .map(compilation -> toCompilationDto(compilation))
