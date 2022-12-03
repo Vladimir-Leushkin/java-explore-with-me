@@ -1,7 +1,6 @@
 package explore.with.me;
 
 import explore.with.me.dto.EndpointHit;
-import explore.with.me.dto.ViewsStats;
 import explore.with.me.model.Stat;
 import org.springframework.stereotype.Component;
 
@@ -15,14 +14,6 @@ public class StatMapper {
                 endpointHit.getUri(),
                 endpointHit.getIp(),
                 endpointHit.getTimestamp()
-        );
-    }
-
-    public static ViewsStats toViewsStats(Stat stat) {
-        return new ViewsStats(
-                stat.getApp(),
-                stat.getUri(),
-                stat.getId()
         );
     }
 }

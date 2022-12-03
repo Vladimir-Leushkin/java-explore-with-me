@@ -25,9 +25,9 @@ public interface StatRepository extends JpaRepository<Stat, Long> {
             "group by h.app, h.uri")
     Collection<ViewsStats> getNotUniqueViews(LocalDateTime start, LocalDateTime end, List<String> uris);
 
-    @Query(value = "select " +
-            "count(h.id) " +
-            "from HITS h " +
-            "where h.uri = ?1", nativeQuery = true)
-    Integer getViews(String uri);
+    @Query("select new explore.with.me.dto.ViewsStats(s.app, s.uri, count(s.ip)) " +
+            "from Stat s " +
+            "where s.uri in (?1) " +
+            "group by s.app, s.uri")
+    List<ViewsStats> getViews(List<String> uris);
 }

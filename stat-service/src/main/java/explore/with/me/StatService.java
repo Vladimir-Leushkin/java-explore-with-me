@@ -48,8 +48,8 @@ public class StatService {
         return stats;
     }
 
-    public Integer getViews(String uri) {
-        log.info("Получение статистики просмотров по uri={}.", uri);
-        return statRepository.getViews(uri);
+    public List<ViewsStats> getViews(List<String> uris) {
+        log.info("Получение статистики просмотров по uri={}.", uris);
+        return statRepository.getViews(uris);
     }
 }

@@ -3,6 +3,7 @@ package explore.with.me.event.service;
 import explore.with.me.State;
 import explore.with.me.category.CategoryService;
 import explore.with.me.category.model.Category;
+import explore.with.me.client.StatClient;
 import explore.with.me.event.EventMapper;
 import explore.with.me.event.dto.EventFullDto;
 import explore.with.me.event.dto.EventShortDto;
@@ -42,7 +43,7 @@ public class EventUserService {
     private final UserService userService;
     private final CategoryService categoryService;
     private final RequestService requestService;
-    private final EventMapper eventMapper;
+    private final StatClient statClient;
 
 
     @Transactional
@@ -54,23 +55,24 @@ public class EventUserService {
         }
         User user = userService.getUser(userId);
         Category category = categoryService.getCategory(newEventDto.getCategory());
-        Event event = eventMapper.toEvent(newEventDto, user, category);
+        Event event = EventMapper.toEvent(newEventDto, user, category);
         Event saveEvent = eventRepository.save(event);
         log.info("Добавлено новое событие : {}", saveEvent);
-        return eventMapper.toEventFullDto(saveEvent);
+        return EventMapper.toEventFullDto(saveEvent);
     }
 
     public List<EventShortDto> readEventsByUser(Long userId, Integer from, Integer size) {
         PageRequest pageRequest = pagination(from, size);
         userService.getUser(userId);
         List<Event> events = eventRepository.findAllByInitiatorId(userId, pageRequest).toList();
-        log.info("Найдены события : {}", events);
         List<EventShortDto> eventsDto = new ArrayList<>();
         if (events.size() != 0) {
             eventsDto = events.stream()
-                    .map(eventMapper::toEventShortDto)
+                    .map(EventMapper::toEventShortDto)
                     .collect(Collectors.toList());
         }
+        statClient.setViewsByList(eventsDto);
+        log.info("Найдены события : {}", eventsDto);
         return eventsDto;
     }
 
@@ -79,7 +81,9 @@ public class EventUserService {
         Event event = findEventById(eventId);
         checkInitiatorEvent(event, user);
         log.info("Найдено событие : {}", event);
-        return eventMapper.toEventFullDto(event);
+        EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
+        statClient.setViews(eventFullDto);
+        return eventFullDto;
     }
 
     public List<RequestDto> readRequestsByEvent(Long eventId, Long userId) {
@@ -107,7 +111,7 @@ public class EventUserService {
         newEvent.setLocationLon(event.getLocationLon());
         Event saveEvent = eventRepository.save(newEvent);
         log.info("Добавлено отредактированное событие : {}", saveEvent);
-        return eventMapper.toEventFullDto(saveEvent);
+        return EventMapper.toEventFullDto(saveEvent);
     }
 
     @Transactional
@@ -118,7 +122,7 @@ public class EventUserService {
         event.setState(State.CANCELED);
         Event saveEvent = eventRepository.save(event);
         log.info("Отменено событие : {}", saveEvent);
-        return eventMapper.toEventFullDto(saveEvent);
+        return EventMapper.toEventFullDto(saveEvent);
     }
 
     @Transactional

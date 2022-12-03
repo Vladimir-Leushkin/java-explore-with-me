@@ -33,8 +33,8 @@ public class StatController {
     }
 
     @GetMapping("/hit")
-    public Integer getViews(@RequestParam String uri) {
-        log.info("Получение статистики просмотров по uri={}.", uri);
-        return statService.getViews(uri);
+    public List<ViewsStats> getViews(@RequestParam(name = "uris", required = false) List<String> uris) {
+        log.info("Получение статистики просмотров по uri={}.", uris);
+        return statService.getViews(uris);
     }
 }

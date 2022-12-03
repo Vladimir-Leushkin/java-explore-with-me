@@ -4,6 +4,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import explore.with.me.State;
 import explore.with.me.category.CategoryService;
 import explore.with.me.category.model.Category;
+import explore.with.me.client.StatClient;
 import explore.with.me.event.EventMapper;
 import explore.with.me.event.dto.AdminUpdateEventDto;
 import explore.with.me.event.dto.EventFullDto;
@@ -33,7 +34,7 @@ public class EventAdminService {
     private final EventRepository eventRepository;
     private final EventUserService eventUserService;
     private final CategoryService categoryService;
-    private final EventMapper eventMapper;
+    private final StatClient statClient;
 
     public List<EventFullDto> readEventsByFilter(List<Long> user, List<String> states, List<Integer> categories,
                                                  String rangeStart, String rangeEnd, Integer from, Integer size) {
@@ -58,8 +59,10 @@ public class EventAdminService {
                 .stream().collect(Collectors.toList());
         eventFullDtos = events
                 .stream()
-                .map(event -> eventMapper.toEventFullDto(event))
+                .map(event -> EventMapper.toEventFullDto(event))
                 .collect(Collectors.toList());
+        statClient.setViewsByListFullDto(eventFullDtos);
+        log.info("Найдены события : {}", eventFullDtos);
         return eventFullDtos;
     }
 
@@ -96,7 +99,8 @@ public class EventAdminService {
             event.setTitle(adminEventDto.getTitle());
         }
         Event saveEvent = eventRepository.save(event);
-        EventFullDto eventFullDto = eventMapper.toEventFullDto(saveEvent);
+        EventFullDto eventFullDto = EventMapper.toEventFullDto(saveEvent);
+        log.info("Обновлено событие : {}", eventFullDto);
         return eventFullDto;
     }
 
@@ -110,7 +114,8 @@ public class EventAdminService {
             event.setPublishedOn(now);
             eventRepository.save(event);
         }
-        EventFullDto eventFullDto = eventMapper.toEventFullDto(event);
+        EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
+        log.info("Опубликовано событие : {}", eventFullDto);
         return eventFullDto;
     }
 
@@ -122,7 +127,9 @@ public class EventAdminService {
         }
         event.setState(State.CANCELED);
         Event saveEvent = eventRepository.save(event);
-        return eventMapper.toEventFullDto(saveEvent);
+        EventFullDto eventFullDto = EventMapper.toEventFullDto(saveEvent);
+        log.info("Отклонено событие : {}", eventFullDto);
+        return eventFullDto;
     }
 
     protected void checkEventTime(Event event, LocalDateTime now) {

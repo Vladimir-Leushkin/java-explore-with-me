@@ -3,7 +3,6 @@ package explore.with.me.event;
 import explore.with.me.State;
 import explore.with.me.category.CategoryMapper;
 import explore.with.me.category.model.Category;
-import explore.with.me.client.StatClient;
 import explore.with.me.event.dto.EventFullDto;
 import explore.with.me.event.dto.EventShortDto;
 import explore.with.me.event.dto.EventUpdateDto;
@@ -21,9 +20,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class EventMapper {
 
-    private final StatClient client;
-
-    public EventFullDto toEventFullDto(Event event) {
+    public static EventFullDto toEventFullDto(Event event) {
         return new EventFullDto(
                 event.getId(),
                 event.getAnnotation(),
@@ -33,7 +30,7 @@ public class EventMapper {
                 UserMapper.toUserDtoShort(event.getInitiator()),
                 event.getPaid(),
                 event.getTitle(),
-                getViews(event.getId()),
+                0,
                 event.getCreatedOn(),
                 event.getDescription(),
                 new Location(event.getLocationLat(), event.getLocationLon()),
@@ -46,7 +43,7 @@ public class EventMapper {
         );
     }
 
-    public EventShortDto toEventShortDto(Event event) {
+    public static EventShortDto toEventShortDto(Event event) {
         return new EventShortDto(
                 event.getId(),
                 event.getAnnotation(),
@@ -56,7 +53,7 @@ public class EventMapper {
                 UserMapper.toUserDtoShort(event.getInitiator()),
                 event.getPaid(),
                 event.getTitle(),
-                getViews(event.getId())
+                0
 
         );
     }
@@ -99,11 +96,6 @@ public class EventMapper {
                 State.PENDING,
                 eventUpdateDto.getTitle()
         );
-    }
-
-    private Integer getViews(Long eventId) {
-        String uri = "/events/" + eventId;
-        return client.getViews(uri).getBody();
     }
 }
 

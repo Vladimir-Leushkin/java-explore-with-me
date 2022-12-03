@@ -3,7 +3,6 @@ package explore.with.me.event.service;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import explore.with.me.State;
 import explore.with.me.client.StatClient;
-import explore.with.me.client.dto.EndpointHit;
 import explore.with.me.event.EventMapper;
 import explore.with.me.event.EventSort;
 import explore.with.me.event.dto.EventFullDto;
@@ -40,15 +39,17 @@ public class EventPublicService {
 
     private final EventRepository eventRepository;
     private final StatClient statClient;
-    private final EventMapper eventMapper;
 
     public EventFullDto readEventByUser(Long id, HttpServletRequest request) {
         Event event = findEventById(id);
         if (!event.getState().equals(State.PUBLISHED)) {
             throw new ForbiddenException("Событие не опубликовано");
         }
-        EventFullDto eventFullDto = eventMapper.toEventFullDto(event);
-        addStat(request);
+        EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
+        statClient.saveStat(request);
+        log.info("Добавлен просмотр событию : {}", event);
+        statClient.setViews(eventFullDto);
+        log.info("Найдено событие : {}", eventFullDto);
         return eventFullDto;
     }
 
@@ -71,7 +72,7 @@ public class EventPublicService {
                 .stream().collect(Collectors.toList());
         List<EventShortDto> eventShortDtos = events
                 .stream()
-                .map(event -> eventMapper.toEventShortDto(event))
+                .map(event -> EventMapper.toEventShortDto(event))
                 .collect(Collectors.toList());
         if (sort != null) {
             EventSort extractedSort;
@@ -93,7 +94,10 @@ public class EventPublicService {
                     break;
             }
         }
-        addStat(request);
+        statClient.saveStat(request);
+        log.info("Добавлен просмотр по запросу : {}", request.getRequestURI());
+        statClient.setViewsByList(eventShortDtos);
+        log.info("Найдены события : {}", eventShortDtos);
         return eventShortDtos;
 
     }
@@ -101,7 +105,7 @@ public class EventPublicService {
     public Event findEventById(Long eventId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Не найдено событие с id = " + eventId));
-        log.info("Найдено мероприятие : {}", event);
+        log.info("Найдено событие : {}", event);
         return event;
     }
 
@@ -135,16 +139,6 @@ public class EventPublicService {
         }
         filters.add(event.state.eq(State.PUBLISHED));
         return filters.stream().reduce(BooleanExpression::and);
-    }
-
-    private void addStat(HttpServletRequest request) {
-        EndpointHit endpointHit = new EndpointHit(
-                null,
-                "ewm-main-service",
-                request.getRequestURI(),
-                request.getRemoteAddr(),
-                LocalDateTime.now());
-        statClient.saveStat(endpointHit);
     }
 
     private PageRequest pagination(int from, int size, String sort) {
