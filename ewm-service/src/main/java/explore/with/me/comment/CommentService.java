@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,16 +41,18 @@ public class CommentService {
         Event event = findEvent(eventId);
         Comment oldComment = commentRepository.findAllByCommentatorIdAndEventId(userId, eventId);
         if (oldComment != null) {
+            log.info("Комментарий уже создан");
             throw new ValidationException("Комментарий уже создан");
         }
         Request request = findRequest(userId, eventId);
         if (request == null || !request.getStatus().equals(RequestState.CONFIRMED)) {
-            throw new NotFoundException("Пользователь не участвовал в событии");
+            log.info("Пользователь не зарегистрирован на событие");
+            throw new NotFoundException("Пользователь не зарегистрирован на событие");
         }
         checkText(text);
         Comment comment = new Comment(null, text, event, user, LocalDateTime.now(), null);
         Comment saveComment = commentRepository.save(comment);
-        log.info("Добавлен новый комментарий : {}", saveComment);
+        log.info("Добавлен новый комментарий : {}", saveComment.getText());
         return CommentMapper.toCommentDto(comment);
     }
 
@@ -71,7 +73,7 @@ public class CommentService {
         findEvent(eventId);
         PageRequest pageRequest = pagination(from, size);
         List<Comment> comments = commentRepository.findAllByEventId(eventId, pageRequest);
-        List<CommentDto> commentsDto = new ArrayList<>();
+        List<CommentDto> commentsDto;
         commentsDto = comments
                 .stream()
                 .map(CommentMapper::toCommentDto)
@@ -91,10 +93,19 @@ public class CommentService {
         User user = findUser(userId);
         Comment comment = findCommentById(commId);
         if (!comment.getCommentator().equals(user)) {
+            log.info("Комментарий не принадлежит пользователю");
             throw new ValidationException("Комментарий не принадлежит пользователю");
         }
         checkText(text);
-        comment.setText(text);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String oldText = comment.getText();
+        StringBuilder newText = new StringBuilder();
+        newText.append(oldText);
+        newText.append(System.lineSeparator());
+        newText.append(LocalDateTime.now().format(formatter));
+        newText.append(System.lineSeparator());
+        newText.append(text);
+        comment.setText(String.valueOf(newText));
         comment.setEditDate(LocalDateTime.now());
         Comment saveComment = commentRepository.save(comment);
         log.info("Обновлен комментарий : {}", saveComment);
@@ -143,6 +154,7 @@ public class CommentService {
 
     protected void checkText(String text) {
         if (text.isEmpty() || text.isBlank()) {
+            log.info("Текст комментария не может быть пустым");
             throw new ValidationException("Текст комментария не может быть пустым");
         }
     }
