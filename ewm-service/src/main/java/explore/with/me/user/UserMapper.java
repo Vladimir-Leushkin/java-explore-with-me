@@ -3,9 +3,8 @@ package explore.with.me.user;
 import explore.with.me.user.dto.UserDto;
 import explore.with.me.user.dto.UserDtoShort;
 import explore.with.me.user.model.User;
-import org.springframework.stereotype.Component;
 
-@Component
+
 public class UserMapper {
 
     public static UserDto toUserDto(User user) {

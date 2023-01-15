@@ -11,13 +11,10 @@ import explore.with.me.event.location.Location;
 import explore.with.me.event.model.Event;
 import explore.with.me.user.UserMapper;
 import explore.with.me.user.model.User;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
-@Component
-@RequiredArgsConstructor
+
 public class EventMapper {
 
     public static EventFullDto toEventFullDto(Event event) {
