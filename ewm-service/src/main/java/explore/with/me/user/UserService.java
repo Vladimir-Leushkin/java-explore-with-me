@@ -20,12 +20,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class UserService {
+public class  UserService {
     private final UserRepository repository;
 
     @Transactional
     public UserDto createUser(UserDto userDto) {
-        User user = null;
+        User user;
         try {
             user = UserMapper.toUser(userDto);
         } catch (DataIntegrityViolationException e) {
