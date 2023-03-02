@@ -14,8 +14,7 @@ public class UserController {
 
     @PostMapping
     public UserDto createUser(@RequestBody UserDto userDto) {
-        UserDto saveUserDto = userService.createUser(userDto);
-        return saveUserDto;
+        return userService.createUser(userDto);
     }
 
     @GetMapping
@@ -23,8 +22,7 @@ public class UserController {
             @RequestParam(name = "ids") List<Long> ids,
             @RequestParam(name = "from", defaultValue = "0") Integer from,
             @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        List<UserDto> usersDto = userService.getUsers(ids, from, size);
-        return usersDto;
+        return userService.getUsers(ids, from, size);
     }
 
     @DeleteMapping("/{id}")
